@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红旗标签</title>
+    <style>
+        .my-label{
+          display: inline-block;
+          position: relative;
+          padding: 0 13px 0 4px;
+          font-size: 14px;
+          line-height: 22px;
+          background-color: rgb(224, 175, 102);
+          color: rgb(152, 90, 9);
+          padding-bottom: 24px;
+          border-radius: 10px 6px 0 0;
+        }
+        .my-label::before{
+          position: absolute;
+          top: -8px;
+          right: 0;
+          content: "";
+          border: 30px solid transparent;
+          border-right-color: #fff;
+          border-bottom-color: #fff;
+          border-right-width: 12px;
+        }
+        .my-label::after{
+          position: absolute;
+          left: 1px;
+          bottom: 0;
+          width: 100%;
+          height: 50%;
+          content: "";
+          background-color: #fff;
+          border-radius: 13px 7px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <label class="my-label">我是标签</label>
+</body>
+</html>
