@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传</title>
+    <style type="text/css">
+        .h-upload-files{
+            display: none;
+        }
+        .h-upload-choose-btn{
+            display: inline-block;
+            width: 100%;
+            height: 100px;
+            margin-top: 20px;
+            line-height: 100px;
+            text-align: center;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .h-upload-choose-btn:hover{
+            background-color: rgb(206, 245, 232);
+        }
+        .h-upload-choose-btn.over{
+            border:10px dashed rgb(206, 245, 232);
+        }
+        video,img{
+            width: 200px;
+            height: 200px;
+            margin-left: 12px;
+            line-height: 200px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <form id="test" method="POST" action="/">
+       <div class="h-upload">
+        <div  class="h-upload-preview"></div>
+        <div>
+            <label for="chooseFile" class="h-upload-choose-btn">上传视频/图片</label>
+            <input type="file"  multiple name="chooseFile" accept="image/*,video/*"  class="h-upload-files" id="chooseFile"/>
+        </div>
+        </div> 
+    </form>
+    
+    <script type="text/javascript">
+        /** 数组forEach */
+        if(![].forEach){
+            Array.prototype.forEach = function (callback) {
+                console.log("2",this);
+                for(var i = 0 ; i < this.length ; i ++){
+                    callback(this[i]);
+                }
+            }
+        }
+        
+
+        /** 储存DOM */
+        var els = {};
+
+        ["h-upload","h-upload-preview","h-upload-choose-btn","h-upload-files"].forEach(function(className){
+            els[className.replace(/-(\w)/g,function($0,$1) { return $1.toUpperCase()})] = document.querySelector("."+className);
+        });
+
+        /** 储存工具方法 */
+        var utils = {
+            createImagePreView:function (file){
+                var image = document.createElement('img');
+                image.src = URL.createObjectURL(file);
+                els.hUploadPreview.appendChild(image);
+            },
+
+            createVideoPreview:function (file){
+                var blobURL = URL.createObjectURL(file);
+                var video = document.createElement("video");
+                video.src = blobURL;
+                video.setAttribute("controls",true)
+                els.hUploadPreview.appendChild(video);
+            },
+
+            createOtherPreview:function (file){
+                var blobURL = URL.createObjectURL(file);
+                var div = document.createElement("div");
+                div.innerHTML = blobURL;
+                els.hUploadPreview.appendChild(div);
+            },
+        };
+
+        var classNameUtils = {
+                contains:function(cName){
+                    var reg = new RegExp("(\s+"+cName+")|("+cName+"\s+)|(^\s*"+cName+"\s*$)","g");
+                    return  reg.test(this.className);
+                },
+                add:function(cName){
+                    if(!classNameUtils.contains(cName)){
+                        this.className +=" "+cName;
+                    }
+                },
+                remove:function(cName){
+                    var cNameIndex = this.className.indexOf(cName);
+                    while(cNameIndex !== -1){
+                        this.className = this.className.substr(0,cNameIndex)+this.className.substr(cNameIndex+cName.length);
+                        cNameIndex = this.className.indexOf(cName);
+                    }
+                    this.className = this.className.trim();
+                },
+            }
+
+        /** 储存事件方法 */
+        var methods = {
+            previewFiles:function (files){
+                console.log("1");
+                Array.prototype.forEach.call(files,function(file){
+                    console.log("3");
+                    console.log(file.type,files);
+                    if(file.type.indexOf("image") !== -1){
+                        console.log("图片",file);
+                        utils.createImagePreView(file);
+                    }   else if(file.type.indexOf("video") !== -1) {
+                        console.log("视频",file);
+                        utils.createVideoPreview(file);
+                    } else {
+                        console.log("其他格式",file);
+                        utils.createOtherPreview(file);
+                    }   
+                });
+            },
+            uploadChange:function (e){
+                var files = els.hUploadFiles.files || [];
+                methods.previewFiles(files);
+            },
+            uploadChooseBtnDragOver:function (e){
+                e.preventDefault();
+                classNameUtils.add.call(this,"over");
+            },
+            uploadChooseBtnDragleave:function (e){
+                classNameUtils.remove.call(this,"over");
+            },
+            uploadChooseBtnDrop:function (e){
+                e.preventDefault();
+                e.stopPropagation();
+                classNameUtils.remove.call(this,"over");
+
+                e.dataTransfer = e.originalEvent && e.originalEvent.dataTransfer;
+                
+                var files = e.dataTransfer.files;
+                methods.previewFiles(files || []);
+            }
+        };
+
+        els.hUploadFiles.onchange = methods.uploadChange;
+
+        els.hUploadChooseBtn.ondragover = methods.uploadChooseBtnDragOver;
+        els.hUploadChooseBtn.ondragleave = methods.uploadChooseBtnDragleave;
+        els.hUploadChooseBtn.ondrop = methods.uploadChooseBtnDrop;
+
+    </script>
+</body>
+</html>
